@@ -31,8 +31,8 @@ document.getElementById('connectBtn').onclick = async () => {
 };
 
 socket.on('signal', async ({ from, data }) => {
-  peerId = from;
   if (data.offer) {
+    peerId = from;
 
     const incomingDiv = document.getElementById('incomingRequest');
     incomingDiv.innerHTML = '';
@@ -47,38 +47,59 @@ socket.on('signal', async ({ from, data }) => {
 
     acceptBtn.onclick = async () => {
       incomingDiv.style.display = 'none';
-      peerConnection = new RTCPeerConnection();
 
-      peerConnection.onicecandidate = ({ candidate }) => {
-        if (candidate) {
-          socket.emit('signal', { to: peerId, data: { ice: candidate }, from: myId });
-        }
-      };
+      // ✅ Init peerConnection with STUN server
+      peerConnection = new RTCPeerConnection({
+        iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
+      });
 
       peerConnection.ondatachannel = (event) => {
         dataChannel = event.channel;
         setupConnection(peerConnection, dataChannel);
       };
 
+      peerConnection.onicecandidate = (event) => {
+        if (event.candidate) {
+          socket.emit('signal', { to: peerId, data: { ice: event.candidate }, from: myId });
+        }
+      };
+
       await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
+      isRemoteDescriptionSet = true;
+
+      // ✅ Apply any queued ICE candidates
+      for (const ice of iceQueue) {
+        await peerConnection.addIceCandidate(new RTCIceCandidate(ice));
+      }
+      iceQueue = [];
+
       const answer = await peerConnection.createAnswer();
       await peerConnection.setLocalDescription(answer);
-
       socket.emit('signal', { to: peerId, data: { answer }, from: myId });
     };
 
     incomingDiv.appendChild(acceptBtn);
     incomingDiv.style.display = 'block';
+
   } else if (data.answer) {
     await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+    isRemoteDescriptionSet = true;
+
+    for (const ice of iceQueue) {
+      await peerConnection.addIceCandidate(new RTCIceCandidate(ice));
+    }
+    iceQueue = [];
+
   } else if (data.ice) {
-    if (peerConnection) {
-      peerConnection.addIceCandidate(new RTCIceCandidate(data.ice));
+    if (peerConnection && isRemoteDescriptionSet) {
+      await peerConnection.addIceCandidate(new RTCIceCandidate(data.ice));
     } else {
-      console.warn("❗ Received ICE candidate before peerConnection was initialized.");
+      iceQueue.push(data.ice); // ✅ Queue if not ready
+      console.warn("❗ ICE queued: peerConnection not ready yet.");
     }
   }
 });
+
 
 function setupConnection(pc, dc) {
   pc.onicecandidate = ({ candidate }) => {
