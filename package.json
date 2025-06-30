@@ -1,0 +1,13 @@
+{
+  "name": "p2p-file-share",
+  "version": "1.0.0",
+  "description": "A simple decentralized P2P file sharing app using WebRTC",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.8.1"
+  }
+}
