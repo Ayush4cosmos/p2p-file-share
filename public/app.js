@@ -6,6 +6,9 @@ let peerId = null;
 let selectedFile = null;
 let receivedChunks = [];
 
+let iceQueue = [];
+let isRemoteDescriptionSet = false;
+
 socket.emit('get-id');
 socket.on('your-id', id => {
   myId = id;
