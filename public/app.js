@@ -53,8 +53,17 @@ socket.on('signal', async ({ from, data }) => {
 
       // ✅ Init peerConnection with STUN server
       peerConnection = new RTCPeerConnection({
-        iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
-      });
+  iceServers: [
+    { urls: "stun:stun.l.google.com:19302" },
+    {
+      urls: "turn:relay.metered.ca:80",
+      username: "openai",
+      credential: "openai"
+    }
+  ]
+});
+
+
 
       peerConnection.ondatachannel = (event) => {
         dataChannel = event.channel;
