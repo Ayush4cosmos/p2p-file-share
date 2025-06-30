@@ -122,7 +122,8 @@ function setupConnection(pc, dc) {
 
  dc.onopen = () => {
   document.getElementById('connect-ui').style.display = 'none';
-  document.getElementById('transfer-ui').style.display = 'flex';
+  document.getElementById('transfer-wrapper').style.display = 'flex';
+  document.body.style.overflow = 'hidden'; // optional
 
   // ✅ Directly update input fields
   document.getElementById('myTransferId').value = myId;
