@@ -89,7 +89,7 @@
   <div class="connect-box">
 <h2 class="connect-heading">
   Your ID:
-  <span style="display: inline-flex; align-items: center; gap: 8px;">
+  <span style="display: inline-flex; align-items: center; gap: 8px; position: relative;">
     <span id="myId" class="user-id" style="white-space: nowrap;"></span>
     <button onclick="copyMyId()" style="
       padding: 4px 6px;
@@ -99,8 +99,20 @@
       border-radius: 4px;
       cursor: pointer;
     ">📋</button>
+    <span id="copy-popup" style="
+      display: none;
+      position: absolute;
+      top: -24px;
+      right: 0;
+      background: #4caf50;
+      color: white;
+      font-size: 0.75rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+    ">Copied!</span>
   </span>
 </h2>
+
     <div class="input-group">
       <input id="peerId" class="input-field" placeholder="Enter Peer ID" />
       <button id="connectBtn" class="connect-btn">Connect</button>
@@ -158,13 +170,16 @@
 
 <script>
   function copyMyId() {
-    const idText = document.getElementById("myId").textContent;
-    navigator.clipboard.writeText(idText).then(() => {
-      alert("Copied ID: " + idText);
-    }).catch(err => {
-      alert("Failed to copy ID.");
-    });
-  }
+  const idText = document.getElementById('myId').textContent;
+  navigator.clipboard.writeText(idText).then(() => {
+    const popup = document.getElementById('copy-popup');
+    popup.style.display = 'inline';
+    setTimeout(() => {
+      popup.style.display = 'none';
+    }, 1000);
+  });
+}
+
 </script>
 <script src="/socket.io/socket.io.js"></script>
 <script src="app.js"></script>
