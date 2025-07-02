@@ -87,7 +87,20 @@
 <!-- 🔌 Connect UI -->
 <div id="connect-ui" class="connect-container">
   <div class="connect-box">
-    <h2 class="connect-heading">Your ID: <span id="myId" class="user-id"></span></h2>
+<h2 class="connect-heading">
+  Your ID:
+  <span style="display: inline-flex; align-items: center; gap: 8px;">
+    <span id="myId" class="user-id" style="white-space: nowrap;"></span>
+    <button onclick="copyMyId()" style="
+      padding: 4px 6px;
+      background-color: #2c2c2c;
+      border: none;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+    ">📋</button>
+  </span>
+</h2>
     <div class="input-group">
       <input id="peerId" class="input-field" placeholder="Enter Peer ID" />
       <button id="connectBtn" class="connect-btn">Connect</button>
@@ -143,12 +156,17 @@
   </div>
 </div>
 
-
-
-
-
-
-  <script src="/socket.io/socket.io.js"></script>
-  <script src="app.js"></script>
+<script>
+  function copyMyId() {
+    const idText = document.getElementById("myId").textContent;
+    navigator.clipboard.writeText(idText).then(() => {
+      alert("Copied ID: " + idText);
+    }).catch(err => {
+      alert("Failed to copy ID.");
+    });
+  }
+</script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
